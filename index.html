@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無印風極簡記帳</title>
+    <title>猴子*記帳本</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons CDN -->
@@ -64,7 +64,7 @@
             <div class="w-8 h-8 rounded-full bg-muji-accent/30 flex items-center justify-center text-muji-dark">
                 <i class="fa-solid font-bold fa-book-open text-xs"></i>
             </div>
-            <h1 class="text-lg font-bold tracking-wide text-muji-dark">無印極簡記帳</h1>
+            <h1 class="text-lg font-bold tracking-wide text-muji-dark">記帳本</h1>
         </div>
         <span id="headerMonth" class="text-xs font-medium text-muji-muted bg-muji-bg px-3 py-1 rounded-full border border-muji-border">
             -- 年 -- 月
@@ -112,11 +112,11 @@
                     </div>
                 </div>
 
-                <!-- 分類選擇 -->
+                <!-- 分類選擇與管理 -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="text-xs font-medium text-muji-muted block">選擇分類</label>
-                        <button type="button" onclick="toggleCategoryManager()" class="text-[11px] text-muji-muted hover:text-muji-dark underline flex items-center space-x-1">
+                        <button type="button" onclick="openCategoryModal()" class="text-xs text-muji-muted hover:text-muji-dark underline flex items-center space-x-1">
                             <i class="fa-solid fa-gear text-[10px]"></i>
                             <span>管理分類</span>
                         </button>
@@ -159,12 +159,12 @@
 
         <!-- ===== 分頁 3: 每月總結 ===== -->
         <section id="tab-summary" class="tab-content hidden space-y-5">
-            <div class="flex justify-between items-center bg-muji-card p-3 rounded-2xl border border-muji-border shadow-sm">
+            <div class="flex justify-between items-center bg-muji-card p-4 rounded-2xl border border-muji-border shadow-sm">
                 <button onclick="changeSummaryMonth(-1)" class="w-8 h-8 rounded-full bg-muji-bg border border-muji-border text-muji-dark flex items-center justify-center hover:bg-muji-border/40">
                     <i class="fa-solid fa-chevron-left text-xs"></i>
                 </button>
                 <div class="flex items-center space-x-1">
-                    <select id="summaryMonthSelect" onchange="onSummaryMonthSelectChange(this.value)" class="bg-transparent text-base font-bold text-muji-dark focus:outline-none cursor-pointer">
+                    <select id="summaryMonthSelect" onchange="onSummarySelectChange()" class="bg-transparent text-base font-bold text-muji-dark focus:outline-none cursor-pointer">
                     </select>
                 </div>
                 <button onclick="changeSummaryMonth(1)" class="w-8 h-8 rounded-full bg-muji-bg border border-muji-border text-muji-dark flex items-center justify-center hover:bg-muji-border/40">
@@ -208,7 +208,7 @@
 
         <!-- ===== 分頁 4: 匯出與設定 ===== -->
         <section id="tab-settings" class="tab-content hidden space-y-4">
-            <!-- Excel 報表匯出 -->
+            <!-- Excel 匯出 -->
             <div class="bg-muji-card p-5 rounded-3xl border border-muji-border shadow-sm space-y-4">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
@@ -233,49 +233,41 @@
                 </button>
             </div>
 
-            <!-- JSON 備份與還原 (iPhone Safari 專用強化版) -->
-            <div class="bg-muji-card p-5 rounded-3xl border border-muji-border shadow-sm space-y-4">
+            <!-- JSON 備份與還原 -->
+            <div class="bg-muji-card p-5 rounded-3xl border border-muji-border shadow-sm space-y-3">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
+                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
                         <i class="fa-solid fa-database text-lg"></i>
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-muji-dark">JSON 備份與還原</h3>
-                        <p class="text-xs text-muji-muted">相容 iPhone Safari 原生檔案儲存與分享</p>
+                        <p class="text-xs text-muji-muted">匯出備份檔或在別台手機復原紀錄</p>
                     </div>
                 </div>
 
-                <div class="space-y-2 pt-1">
-                    <!-- 1. 下載/分享 JSON 備份檔 -->
-                    <button onclick="exportJSON()"
-                        class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 rounded-xl shadow-sm transition active:scale-[0.99] flex items-center justify-center space-x-2 text-sm">
-                        <i class="fa-solid fa-share-nodes text-xs"></i>
-                        <span>備份/下載 JSON 檔案 (.json)</span>
-                    </button>
-
-                    <!-- 2. 複製 JSON 字串 (備用剪貼簿方案) -->
-                    <button onclick="copyJSONToClipboard()"
+                <div class="pt-2 flex flex-col space-y-2">
+                    <button onclick="exportJSONBackup()"
                         class="w-full bg-muji-bg hover:bg-muji-border/40 text-muji-dark font-medium py-2.5 rounded-xl border border-muji-border text-xs transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-copy text-xs text-muji-muted"></i>
-                        <span>複製 JSON 備份文字 (剪貼簿)</span>
+                        <i class="fa-solid fa-file-export text-xs"></i>
+                        <span>下載 JSON 備份檔 (.json)</span>
                     </button>
-
-                    <!-- 3. 上傳 JSON 還原 -->
-                    <label class="w-full bg-muji-bg hover:bg-muji-border/40 text-muji-dark font-medium py-2.5 rounded-xl border border-muji-border text-xs transition flex items-center justify-center space-x-2 cursor-pointer">
-                        <i class="fa-solid fa-upload text-xs text-muji-muted"></i>
-                        <span>選擇 JSON 檔案上傳還原</span>
-                        <input type="file" id="importJsonInput" accept=".json,application/json" onchange="importJSON(event)" class="hidden">
-                    </label>
+                    
+                    <button onclick="document.getElementById('importJsonInput').click()"
+                        class="w-full bg-muji-bg hover:bg-muji-border/40 text-muji-dark font-medium py-2.5 rounded-xl border border-muji-border text-xs transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-file-import text-xs"></i>
+                        <span>匯入 JSON 備份檔 (.json)</span>
+                    </button>
+                    <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importJSONBackup(event)">
                 </div>
             </div>
 
-            <!-- 資料庫管理 (已移除示範資料按鈕) -->
+            <!-- 資料庫管理 -->
             <div class="bg-muji-card p-5 rounded-3xl border border-muji-border shadow-sm space-y-3">
                 <h3 class="text-xs font-bold text-muji-dark tracking-wide">資料庫管理 (LocalStorage)</h3>
                 <p class="text-xs text-muji-muted leading-relaxed">
-                    所有記帳資料與自訂分類均妥善儲存於手機區域記憶體中。清除後將無法復原。
+                    所有記帳資料均妥善儲存於手機區域記憶體中。清除後將無法復原。
                 </p>
-                <div class="pt-2 flex flex-col space-y-2">
+                <div class="pt-2">
                     <button onclick="clearAllData()"
                         class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2.5 rounded-xl border border-red-100 text-xs transition">
                         清除所有本機資料
@@ -286,28 +278,23 @@
 
     </main>
 
-    <!-- 管理分類對話框 Modal -->
-    <div id="categoryModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-200">
-        <div class="bg-muji-card w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-xl border border-muji-border">
+    <!-- 分類管理 Modal -->
+    <div id="categoryModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-muji-card w-full max-w-xs rounded-3xl p-5 border border-muji-border shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-muji-border pb-3">
-                <h3 class="text-sm font-bold text-muji-dark">管理分類項目</h3>
-                <button onclick="toggleCategoryManager()" class="text-muji-muted hover:text-muji-dark text-lg p-1">
-                    <i class="fa-solid fa-xmark"></i>
+                <h3 class="text-sm font-bold text-muji-dark">管理<span id="modalTypeName">支出</span>分類</h3>
+                <button onclick="closeCategoryModal()" class="text-muji-muted hover:text-muji-dark">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-
-            <!-- 新增分類輸入區 -->
-            <div class="flex space-x-2">
-                <input type="text" id="newCategoryInput" placeholder="輸入新分類名稱..."
-                    class="flex-1 bg-muji-bg border border-muji-border rounded-xl px-3 py-2 text-xs text-muji-dark focus:outline-none focus:ring-2 focus:ring-muji-accent/50">
-                <button onclick="addCustomCategory()" class="bg-muji-dark text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-black transition">
-                    新增
-                </button>
+            <div id="modalCategoryList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <!-- 動態生成分類清單與刪除按鈕 -->
             </div>
-
-            <!-- 分類清單展示 -->
-            <div id="customCategoryList" class="max-h-60 overflow-y-auto space-y-2 pr-1 no-scrollbar pt-2">
-                <!-- 動態注入分類標籤 -->
+            <div class="pt-2 border-t border-muji-border">
+                <button onclick="addCustomCategoryPrompt()" class="w-full bg-muji-bg hover:bg-muji-border/40 text-muji-dark font-medium py-2.5 rounded-xl border border-muji-border text-xs transition flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>新增分類</span>
+                </button>
             </div>
         </div>
     </div>
@@ -360,9 +347,8 @@
             '零用金/紅包': 'fa-gift'
         };
 
-        let categories = loadCustomCategories();
         let currentType = 'expense';
-        let selectedCategory = categories.expense[0] || '零用金';
+        let selectedCategory = '零用金';
         let summaryYearMonth = new Date().toISOString().slice(0, 7);
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -385,18 +371,21 @@
             localStorage.setItem('muji_accounting_records', JSON.stringify(records));
         }
 
-        function loadCustomCategories() {
-            const data = localStorage.getItem('muji_custom_categories');
+        function getCategories() {
+            const data = localStorage.getItem('muji_accounting_categories');
             if (data) {
                 try {
-                    return JSON.parse(data);
+                    const parsed = JSON.parse(data);
+                    if (parsed && parsed.expense && parsed.income) {
+                        return parsed;
+                    }
                 } catch(e) {}
             }
             return JSON.parse(JSON.stringify(defaultCategories));
         }
 
-        function saveCustomCategories() {
-            localStorage.setItem('muji_custom_categories', JSON.stringify(categories));
+        function saveCategoriesToStorage(cats) {
+            localStorage.setItem('muji_accounting_categories', JSON.stringify(cats));
         }
 
         function setType(type) {
@@ -414,8 +403,9 @@
                 btnIncome.className = "flex-1 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center justify-center space-x-1.5 bg-muji-incomeBg text-muji-income shadow-sm font-semibold";
             }
 
-            if (!categories[currentType].includes(selectedCategory)) {
-                selectedCategory = categories[currentType][0] || '其他';
+            const allCats = getCategories();
+            if (allCats[type] && allCats[type].length > 0) {
+                selectedCategory = allCats[type][0];
             }
             renderCategories();
         }
@@ -424,7 +414,14 @@
             const container = document.getElementById('categoryContainer');
             container.innerHTML = '';
             
-            categories[currentType].forEach(cat => {
+            const allCats = getCategories();
+            const currentList = allCats[currentType] || [];
+
+            if (!currentList.includes(selectedCategory) && currentList.length > 0) {
+                selectedCategory = currentList[0];
+            }
+
+            currentList.forEach(cat => {
                 const isSelected = cat === selectedCategory;
                 const icon = categoryIcons[cat] || 'fa-tag';
                 const btn = document.createElement('button');
@@ -450,73 +447,93 @@
             // 新增分類按鈕
             const addBtn = document.createElement('button');
             addBtn.type = 'button';
-            addBtn.onclick = () => toggleCategoryManager();
-            addBtn.className = "p-2.5 rounded-xl text-xs flex flex-col items-center justify-center space-y-1 transition border border-dashed border-muji-muted/50 text-muji-muted hover:text-muji-dark hover:border-muji-dark";
+            addBtn.onclick = addCustomCategoryPrompt;
+            addBtn.className = 'p-2.5 rounded-xl text-xs flex flex-col items-center justify-center space-y-1 transition border border-dashed border-muji-border text-muji-muted hover:text-muji-dark hover:border-muji-dark bg-muji-bg/40';
             addBtn.innerHTML = `
-                <i class="fa-solid fa-plus text-sm"></i>
-                <span class="truncate w-full text-center">新增</span>
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span class="truncate w-full text-center font-medium">新增</span>
             `;
             container.appendChild(addBtn);
         }
 
-        function toggleCategoryManager() {
-            const modal = document.getElementById('categoryModal');
-            if (modal.classList.contains('opacity-0')) {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                renderModalCategoryList();
-            } else {
-                modal.classList.add('opacity-0', 'pointer-events-none');
+        function addCustomCategoryPrompt() {
+            const typeName = currentType === 'income' ? '收入' : '支出';
+            const inputName = prompt(`請輸入新增的【${typeName}】分類名稱：`);
+            if (!inputName) return;
+            const name = inputName.trim();
+            if (!name) return;
+
+            const allCats = getCategories();
+            if (allCats[currentType].includes(name)) {
+                showToast('此分類名稱已存在', 'fa-circle-exclamation');
+                return;
             }
+
+            allCats[currentType].push(name);
+            saveCategoriesToStorage(allCats);
+            selectedCategory = name;
+            renderCategories();
+            if (!document.getElementById('categoryModal').classList.contains('hidden')) {
+                renderModalCategoryList();
+            }
+            showToast(`已新增分類「${name}」！`);
+        }
+
+        function openCategoryModal() {
+            document.getElementById('modalTypeName').innerText = currentType === 'income' ? '收入' : '支出';
+            renderModalCategoryList();
+            document.getElementById('categoryModal').classList.remove('hidden');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
         }
 
         function renderModalCategoryList() {
-            const list = document.getElementById('customCategoryList');
-            list.innerHTML = '';
+            const listContainer = document.getElementById('modalCategoryList');
+            listContainer.innerHTML = '';
 
-            categories[currentType].forEach(cat => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-muji-bg p-2.5 rounded-xl border border-muji-border text-xs";
-                div.innerHTML = `
-                    <span class="font-medium text-muji-dark">${cat}</span>
-                    <button onclick="removeCategory('${cat}')" class="text-muji-muted hover:text-red-500 transition px-2">
+            const allCats = getCategories();
+            const currentList = allCats[currentType] || [];
+
+            currentList.forEach(cat => {
+                const icon = categoryIcons[cat] || 'fa-tag';
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-muji-bg border border-muji-border/80 text-xs';
+                row.innerHTML = `
+                    <div class="flex items-center space-x-2 text-muji-dark">
+                        <i class="fa-solid ${icon} text-muji-muted"></i>
+                        <span class="font-medium">${cat}</span>
+                    </div>
+                    <button type="button" onclick="deleteCustomCategory('${cat}')" class="text-muji-muted hover:text-red-500 transition p-1">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 `;
-                list.appendChild(div);
+                listContainer.appendChild(row);
             });
         }
 
-        function addCustomCategory() {
-            const input = document.getElementById('newCategoryInput');
-            const newCat = input.value.trim();
-            if (!newCat) return;
+        function deleteCustomCategory(catName) {
+            const allCats = getCategories();
+            const currentList = allCats[currentType] || [];
 
-            if (categories[currentType].includes(newCat)) {
-                showToast('該分類名稱已存在', 'fa-circle-exclamation');
+            if (currentList.length <= 1) {
+                showToast('最少需保留一個分類', 'fa-circle-exclamation');
                 return;
             }
 
-            categories[currentType].push(newCat);
-            saveCustomCategories();
-            input.value = '';
-            showToast('已新增分類：' + newCat);
-            renderCategories();
-            renderModalCategoryList();
-        }
+            if (confirm(`確定要刪除「${catName}」分類嗎？`)) {
+                allCats[currentType] = currentList.filter(c => c !== catName);
+                saveCategoriesToStorage(allCats);
 
-        function removeCategory(cat) {
-            if (categories[currentType].length <= 1) {
-                showToast('至少需保留一個分類', 'fa-circle-exclamation');
-                return;
+                if (selectedCategory === catName) {
+                    selectedCategory = allCats[currentType][0];
+                }
+
+                renderCategories();
+                renderModalCategoryList();
+                showToast(`已刪除分類「${catName}」`);
             }
-            categories[currentType] = categories[currentType].filter(c => c !== cat);
-            saveCustomCategories();
-            showToast('已移除分類：' + cat);
-            if (selectedCategory === cat) {
-                selectedCategory = categories[currentType][0];
-            }
-            renderCategories();
-            renderModalCategoryList();
         }
 
         function saveRecord(e) {
@@ -557,22 +574,24 @@
 
         function updateFilterMonthOptions() {
             const records = getRecords();
-            const filterSelect = document.getElementById('filterMonth');
-            if (!filterSelect) return;
+            const filterMonthSelect = document.getElementById('filterMonth');
+            if (!filterMonthSelect) return;
 
-            const currentVal = filterSelect.value;
+            const currentVal = filterMonthSelect.value;
             const months = [...new Set(records.map(r => r.date.slice(0, 7)))].sort().reverse();
-            const nowYM = new Date().toISOString().slice(0, 7);
-            if (!months.includes(nowYM)) {
-                months.unshift(nowYM);
+            if (months.length === 0) {
+                const nowYM = new Date().toISOString().slice(0, 7);
+                months.push(nowYM);
             }
 
-            filterSelect.innerHTML = months.map(m => 
+            filterMonthSelect.innerHTML = months.map(m => 
                 `<option value="${m}">${m.replace('-', ' 年 ')} 月</option>`
             ).join('');
 
             if (currentVal && months.includes(currentVal)) {
-                filterSelect.value = currentVal;
+                filterMonthSelect.value = currentVal;
+            } else {
+                filterMonthSelect.value = months[0];
             }
         }
 
@@ -649,24 +668,25 @@
 
         function updateSummaryMonthOptions() {
             const records = getRecords();
-            const select = document.getElementById('summaryMonthSelect');
-            if (!select) return;
+            const summarySelect = document.getElementById('summaryMonthSelect');
+            if (!summarySelect) return;
 
             const months = [...new Set(records.map(r => r.date.slice(0, 7)))].sort().reverse();
             if (!months.includes(summaryYearMonth)) {
                 months.unshift(summaryYearMonth);
-                months.sort().reverse();
             }
+            months.sort().reverse();
 
-            select.innerHTML = months.map(m => 
+            summarySelect.innerHTML = months.map(m => 
                 `<option value="${m}">${m.replace('-', ' 年 ')} 月</option>`
             ).join('');
 
-            select.value = summaryYearMonth;
+            summarySelect.value = summaryYearMonth;
         }
 
-        function onSummaryMonthSelectChange(val) {
-            summaryYearMonth = val;
+        function onSummarySelectChange() {
+            const select = document.getElementById('summaryMonthSelect');
+            summaryYearMonth = select.value;
             renderSummary();
         }
 
@@ -674,8 +694,10 @@
             const records = getRecords();
             const monthRecords = records.filter(r => r.date.startsWith(summaryYearMonth));
 
-            const select = document.getElementById('summaryMonthSelect');
-            if (select) select.value = summaryYearMonth;
+            const summarySelect = document.getElementById('summaryMonthSelect');
+            if (summarySelect) {
+                summarySelect.value = summaryYearMonth;
+            }
 
             let totalIncome = 0;
             let totalExpense = 0;
@@ -726,16 +748,21 @@
         }
 
         function changeSummaryMonth(offset) {
-            let [y, m] = summaryYearMonth.split('-').map(Number);
-            m += offset;
-            if (m > 12) {
-                y += 1;
-                m = 1;
-            } else if (m < 1) {
-                y -= 1;
-                m = 12;
+            const [y, m] = summaryYearMonth.split('-').map(Number);
+            let newYear = y;
+            let newMonth = m + offset;
+            
+            if (newMonth > 12) {
+                newYear += 1;
+                newMonth = 1;
+            } else if (newMonth < 1) {
+                newYear -= 1;
+                newMonth = 12;
             }
-            summaryYearMonth = `${y}-${String(m).padStart(2, '0')}`;
+
+            const monthStr = newMonth < 10 ? '0' + newMonth : '' + newMonth;
+            summaryYearMonth = `${newYear}-${monthStr}`;
+            
             updateSummaryMonthOptions();
             renderSummary();
         }
@@ -832,139 +859,65 @@
             showToast(`已成功匯出 ${periodTitle} Excel 報表！`);
         }
 
-        // ===== JSON 匯出 (專為 iPhone Safari 優化) =====
-        function exportJSON() {
+        // JSON 備份檔匯出
+        function exportJSONBackup() {
             const records = getRecords();
-            const customCat = localStorage.getItem('muji_custom_categories');
-            
-            if (records.length === 0 && !customCat) {
-                showToast('目前尚無記帳資料可供備份', 'fa-circle-exclamation');
-                return;
-            }
+            const categories = getCategories();
 
             const backupObj = {
-                app: "無印極簡記帳",
+                app: "MujiAccounting",
                 version: "1.0",
-                exportDate: new Date().toISOString(),
+                exportedAt: new Date().toISOString(),
                 records: records,
-                customCategories: customCat ? JSON.parse(customCat) : null
+                categories: categories
             };
 
-            const jsonStr = JSON.stringify(backupObj, null, 2);
-            const fileName = `無印極簡記帳_JSON備份檔_${new Date().toISOString().slice(0, 10)}.json`;
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-
-            // 1. 優先試用 iOS Native Web Share API (開啟 iOS 原生分享選單 -> 可直接點選「儲存至『檔案』」)
-            if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'application/json' })] })) {
-                try {
-                    const file = new File([blob], fileName, { type: 'application/json' });
-                    navigator.share({
-                        files: [file],
-                        title: '無印極簡記帳備份',
-                        text: '請選擇「儲存至『檔案』」存檔'
-                    }).then(() => {
-                        showToast('已開啟選單，可點選「儲存至檔案」');
-                    }).catch(err => {
-                        if (err.name !== 'AbortError') {
-                            fallbackDownloadBlob(blob, fileName);
-                        }
-                    });
-                    return;
-                } catch(e) {
-                    console.warn("Share API fallback triggered", e);
-                }
-            }
-
-            // 2. 一般瀏覽器及 iOS Safari 觸發連結下載
-            fallbackDownloadBlob(blob, fileName);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `無印極簡記帳_JSON備份檔_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('JSON 備份檔匯出完成！');
         }
 
-        function fallbackDownloadBlob(blob, fileName) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.target = '_blank';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('已嘗試下載備份檔，請檢查「下載項目」');
-            }, 1000);
-        }
-
-        // ===== 複製 JSON 文字備份 (備用方案) =====
-        function copyJSONToClipboard() {
-            const records = getRecords();
-            const customCat = localStorage.getItem('muji_custom_categories');
-            const backupObj = {
-                app: "無印極簡記帳",
-                version: "1.0",
-                exportDate: new Date().toISOString(),
-                records: records,
-                customCategories: customCat ? JSON.parse(customCat) : null
-            };
-            const jsonStr = JSON.stringify(backupObj);
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(jsonStr).then(() => {
-                    showToast('已複製 JSON 備份內容至剪貼簿！');
-                }).catch(() => {
-                    legacyCopyText(jsonStr);
-                });
-            } else {
-                legacyCopyText(jsonStr);
-            }
-        }
-
-        function legacyCopyText(text) {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('已複製 JSON 備份內容至剪貼簿！');
-        }
-
-        // ===== JSON 還原 =====
-        function importJSON(e) {
-            const file = e.target.files[0];
+        // JSON 備份檔匯入
+        function importJSONBackup(event) {
+            const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(evt.target.result);
-                    let importedRecords = [];
-
-                    if (Array.isArray(data)) {
-                        importedRecords = data;
-                    } else if (data && Array.isArray(data.records)) {
-                        importedRecords = data.records;
-                        if (data.customCategories) {
-                            localStorage.setItem('muji_custom_categories', JSON.stringify(data.customCategories));
-                            categories = loadCustomCategories();
-                            renderCategories();
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && Array.isArray(parsed.records)) {
+                        saveRecordsToStorage(parsed.records);
+                        if (parsed.categories) {
+                            saveCategoriesToStorage(parsed.categories);
                         }
-                    } else {
-                        throw new Error('格式無法辨識');
-                    }
-
-                    if (confirm(`確定要還原包含 ${importedRecords.length} 筆記帳資料的備份嗎？這將覆蓋本機資料。`)) {
-                        saveRecordsToStorage(importedRecords);
-                        showToast('資料已成功還原復原！');
+                        showToast('成功匯入並還原備份資料！');
+                        renderCategories();
                         updateFilterMonthOptions();
                         renderList();
                         updateSummaryMonthOptions();
                         renderSummary();
                         updateExportMonthOptions();
+                    } else if (Array.isArray(parsed)) {
+                        saveRecordsToStorage(parsed);
+                        showToast('成功匯入歷史紀錄！');
+                        updateFilterMonthOptions();
+                        renderList();
+                        updateSummaryMonthOptions();
+                        renderSummary();
+                        updateExportMonthOptions();
+                    } else {
+                        showToast('JSON 檔案格式不符合需求', 'fa-circle-exclamation');
                     }
-                } catch (err) {
-                    showToast('JSON 檔案格式錯誤，解析失敗', 'fa-circle-exclamation');
+                } catch(err) {
+                    showToast('解析 JSON 檔案失敗', 'fa-circle-exclamation');
                 }
-                e.target.value = '';
+                event.target.value = '';
             };
             reader.readAsText(file);
         }
@@ -972,8 +925,7 @@
         function clearAllData() {
             if (confirm('確定要清除所有本機記帳紀錄與自訂分類嗎？此動作無法復原！')) {
                 localStorage.removeItem('muji_accounting_records');
-                localStorage.removeItem('muji_custom_categories');
-                categories = loadCustomCategories();
+                localStorage.removeItem('muji_accounting_categories');
                 showToast('資料已全數清空');
                 renderCategories();
                 updateFilterMonthOptions();
